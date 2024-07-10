@@ -1,13 +1,3 @@
-# - Whitestone
-# - Wallington
-# - Catalysm
-# - Belaware
-# - Gohen
-# - Applebead
-# - Magnum
-# - Trustmind
-# - Leeder
-# - Virtous
 import pandas as pd
 from sqlalchemy import create_engine, Table, Column, Integer, Float, String, MetaData
 import os, re
