@@ -10,7 +10,7 @@ class GenerateFundReport:
     def __init__(self):
         [f.unlink() for f in Path(r"C:\Users\PC\Desktop\Git\gic_assessment\reports").glob("*") if f.is_file()]
         self.time_now = time.strftime("%Y_%m_%d_%H%M%S")
-        self.report_path = r"C:\Users\PC\Desktop\Git\gic_assessment\reports\REPORT_{}".format(self.time_now)
+        self.report_path = r"C:\Users\PC\Desktop\Git\gic_assessment\reports\[FUNDS]PRICE_RECONCILIATION_{}".format(self.time_now)
         os.mkdir(self.report_path)
         self.db_uri = r'postgresql://postgres:admin123@localhost:5432/gic_funds'
         self.engine = create_engine(self.db_uri)
