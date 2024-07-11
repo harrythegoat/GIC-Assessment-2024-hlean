@@ -140,6 +140,12 @@ class GenerateFundReport:
 
         return True
 
+    def get_top_fund_monthly(self):
+        pass
+
+    def get_all_time_fund(self):
+        pass
+
 if __name__ == '__main__':
     get_reports = GenerateFundReport()
     asyncio.run(get_reports.main())
