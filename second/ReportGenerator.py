@@ -3,34 +3,39 @@ import polars as pl
 from datetime import datetime
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
-
 load_dotenv()
+
+
 class FundReportGenerator:
     def __init__(self):
+        self.time_now = time.strftime("%Y_%m_%d_%H%M%S")
+        self.paths = {
+            "reports": os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'reports'))
+        }
+        if not os.path.exists(self.paths["reports"]):
+            os.mkdir(self.paths["reports"])
+        self.price_reco_path = os.path.join(self.paths["reports"], "[FUNDS]PRICE_RECO_{}".format(self.time_now))
+        if not os.path.exists(self.price_reco_path):
+            os.mkdir(self.price_reco_path)
+
         self.fund_report_path = ""
         self.equity_report_path = ""
         self.bond_report_path = ""
-        self.time_now = time.strftime("%Y_%m_%d_%H%M%S")
-        self.reports_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'reports'))
-        if not os.path.exists(self.reports_path):
-            os.mkdir(self.reports_path)
-        self.price_reco_path = os.path.join(self.reports_path, "[FUNDS]PRICE_RECO_{}".format(self.time_now))
-        if not os.path.exists(self.price_reco_path):
-            os.mkdir(self.price_reco_path)
         self.db_uri = os.getenv("DB_URL")
         self.engine = create_engine(self.db_uri)
-
         # Maybe DRY too much
-        self.external_funds_query = os.getenv("EXTERNAL_FUNDS")
-        self.equities_prices_query = os.getenv("EQUITIES_PRICES")
-        self.bonds_prices_query = os.getenv("BONDS_PRICES")
-        self.monthly_performing_view = os.getenv("MONTHLY_PERFORMING")
-        self.all_time_performing_view = os.getenv("ALL_TIME_PERFORMING")
-        self.external_funds = pl.read_database(query=self.external_funds_query, connection=self.engine.connect(),
+        self.queries = {
+            "external_funds": os.getenv("EXTERNAL_FUNDS"),
+            "equities_prices": os.getenv("EQUITIES_PRICES"),
+            "bonds_prices": os.getenv("BONDS_PRICES"),
+            "monthly_performing": os.getenv("MONTHLY_PERFORMING"),
+            "all_time_performing": os.getenv("ALL_TIME_PERFORMING")
+        }
+        self.external_funds = pl.read_database(query=self.queries["external_funds"], connection=self.engine.connect(),
                                                infer_schema_length=None)
-        self.equity_prices = pl.read_database(query=self.equities_prices_query, connection=self.engine.connect(),
+        self.equity_prices = pl.read_database(query=self.queries["equities_prices"], connection=self.engine.connect(),
                                               infer_schema_length=None)
-        self.bond_prices = pl.read_database(query=self.bonds_prices_query, connection=self.engine.connect(),
+        self.bond_prices = pl.read_database(query=self.queries["bonds_prices"], connection=self.engine.connect(),
                                             infer_schema_length=None)
         self.funds = pl.Series(self.external_funds.select(pl.col("FUND").unique())).sort().to_list()
 
@@ -49,8 +54,8 @@ class FundReportGenerator:
             end_time = time.time()
 
             self.logger(msg="Generating Views for Monthly & All Time Top Performing Fund")
-            top_fund_monthly = self.get_view(query=self.monthly_performing_view)
-            top_fund_max = self.get_view(query=self.all_time_performing_view)
+            top_fund_monthly = self.get_view(query=self.queries["monthly_performing"])
+            top_fund_max = self.get_view(query=self.queries["all_time_performing"])
             pl.Config().set_tbl_rows(13)
             pl.Config.set_tbl_hide_dataframe_shape(True)
             pl.Config.set_tbl_hide_column_data_types(True)
@@ -123,9 +128,9 @@ class FundReportGenerator:
 
     async def generate_report(self, fund: str):
         try:
-            self.logger(msg="Generating ({}) Monthly Price Reconciliation Report".format(fund.upper()))
-
             self.initialize_saves(fund=fund)
+            self.logger(msg="Generating ({}) Monthly Price Reconciliation Report at {}".format(fund.upper(),
+                                                                                               self.fund_report_path))
 
             fund_positions = self.external_funds.filter(pl.col('FUND') == fund)
 
@@ -182,6 +187,8 @@ class FundReportGenerator:
             return pl.Series(positions.filter(pl.col("FINANCIAL TYPE") == name)["SYMBOL"]).unique().sort().to_list()
         except Exception as err:
             self.logger(msg=err)
+
+
 if __name__ == '__main__':
     reports = FundReportGenerator()
     asyncio.run(reports.main())
