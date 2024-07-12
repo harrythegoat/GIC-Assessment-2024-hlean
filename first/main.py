@@ -1,4 +1,4 @@
-import asyncio, time, json
+import asyncio, time
 import pandas as pd
 from sqlalchemy import create_engine
 
