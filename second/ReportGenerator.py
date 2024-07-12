@@ -7,14 +7,20 @@ from dotenv import load_dotenv
 load_dotenv()
 class FundReportGenerator:
     def __init__(self):
-        self.time_now = time.strftime("%Y_%m_%d_%H%M%S")
-        self.report_path = r"C:\Users\PC\Desktop\Git\gic_assessment\reports\[FUNDS]PRICE_RECO_{}".format(self.time_now)
-        os.mkdir(self.report_path)
         self.fund_report_path = ""
         self.equity_report_path = ""
         self.bond_report_path = ""
+        self.time_now = time.strftime("%Y_%m_%d_%H%M%S")
+        self.reports_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'reports'))
+        if not os.path.exists(self.reports_path):
+            os.mkdir(self.reports_path)
+        self.price_reco_path = os.path.join(self.reports_path, "[FUNDS]PRICE_RECO_{}".format(self.time_now))
+        if not os.path.exists(self.price_reco_path):
+            os.mkdir(self.price_reco_path)
         self.db_uri = os.getenv("DB_URL")
         self.engine = create_engine(self.db_uri)
+
+        # Maybe DRY too much
         self.external_funds_query = os.getenv("EXTERNAL_FUNDS")
         self.equities_prices_query = os.getenv("EQUITIES_PRICES")
         self.bonds_prices_query = os.getenv("BONDS_PRICES")
@@ -70,12 +76,13 @@ class FundReportGenerator:
                 pl.col('DATETIME').str.strptime(pl.Datetime, format=date_format, strict=False).dt.year().alias('YEAR')
             ).sort('DATETIME')
 
-            # Partition data by year and month
+            # Partition data by Month, Year and SYMBOL/ISIN
             month_year_partition_df = get_month_year_df.partition_by('YEAR', 'MONTH', uni_col)
 
-            # Extend dataframe with all the relevant row as the previous step will partition them into individual table
+            # Get all the end of month price data from master reference by Month, Year
             month_year_df = None
             for partition in month_year_partition_df:
+                # Extending data frame one by one
                 temp_df = pl.DataFrame(partition)
                 eom_date = temp_df.select(pl.last("DATETIME", "PRICE", uni_col, "MONTH", "YEAR"))
                 if month_year_df is None:
@@ -83,24 +90,27 @@ class FundReportGenerator:
                 else:
                     month_year_df.extend(eom_date)
 
-            # Filter the dataframe by fund
+            # Price data from master reference
             filtered_month_year_df = month_year_df.select(pl.col(uni_col), pl.col('DATETIME').sort(),
-                                          pl.col('PRICE').alias('REF PRICE'), pl.col('MONTH'),
-                                          pl.col('YEAR'))
+                                                          pl.col('PRICE').alias('REF PRICE'), pl.col('MONTH'),
+                                                          pl.col('YEAR'))
 
+            # Price data from reference row that is matching to fund's report date(month, year)
             filtered_fund_df = (positions.filter(pl.col("SYMBOL") == name).sort(by=pl.col('DATE')).select(
                 pl.all(),
                 pl.col("DATE").dt.month().alias('MONTH'),
                 pl.col("DATE").dt.year().alias('YEAR')))
 
+            # Join the two tables and will have ref price and fund price side by side
             join_price_df = filtered_month_year_df.join(filtered_fund_df, on=["YEAR", "MONTH"], how="inner")
 
+            # Generate result df for writing to csv
             result_df = join_price_df.select(pl.col(uni_col), pl.col("REF PRICE"),
-                                              pl.col("DATETIME").alias("REF DATE"),
-                                              pl.col("PRICE").alias("FUND PRICE"),
-                                              pl.col("DATE").alias("FUND DATE"),
-                                              (pl.col("REF PRICE").cast(pl.Float64) - pl.col("PRICE").cast(pl.Float64))
-                                              .alias("PRICE DIFF"))
+                                             pl.col("DATETIME").alias("REF DATE"),
+                                             pl.col("PRICE").alias("FUND PRICE"),
+                                             pl.col("DATE").alias("FUND DATE"),
+                                             (pl.col("REF PRICE").cast(pl.Float64) - pl.col("PRICE").cast(pl.Float64))
+                                             .alias("PRICE DIFF"))
 
             report_name = os.path.join(path, "[{}]{}_{}_{}.csv".format("Equity" if equity else "Bond", fund, name,
                                                                        self.time_now))
@@ -114,7 +124,9 @@ class FundReportGenerator:
     async def generate_report(self, fund: str):
         try:
             self.logger(msg="Generating ({}) Monthly Price Reconciliation Report".format(fund.upper()))
+
             self.initialize_saves(fund=fund)
+
             fund_positions = self.external_funds.filter(pl.col('FUND') == fund)
 
             result_equities = [
@@ -145,7 +157,7 @@ class FundReportGenerator:
     def initialize_saves(self, fund: str):
         try:
             created, paths = [], []
-            self.fund_report_path = os.path.join(self.report_path, fund)
+            self.fund_report_path = os.path.join(self.price_reco_path, fund)
             self.equity_report_path = os.path.join(self.fund_report_path, 'Equities')
             self.bond_report_path = os.path.join(self.fund_report_path, 'Bonds')
             paths.extend((self.fund_report_path, self.equity_report_path, self.bond_report_path))
