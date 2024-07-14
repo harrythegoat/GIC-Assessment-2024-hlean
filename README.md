@@ -6,8 +6,8 @@ first - Approach for the first assessment.<br/>
 
 second - Approach for the second assessment.<br/>
 
-sql_schemas - Schemas for creating top performing funds in months and all-time
-<br/>
+sql_schemas - Schemas for creating top performing funds in months and all-time<br/>
+
 Steps-To-Load:<br/>
   1. Create PostgreSQL database.
   2. Adjust environment variables value in .env file.
@@ -19,7 +19,7 @@ Steps-To-Load:<br/>
   8. WRITE_TO_DB (Only String "TRUE" or "FALSE" is acceptable) can be set to toggle update generated report data to db via .env file (data can be access by querying price_difference table).
 
 <br/>
-Gap-Required-For-Production:<br/>
+Gap-Required-For-Production:
   1. UnitTest to be completed.
   2. More robust PostgreSQL CRUD methods/class.
   3. Store server/db keys to more secured platform (AWS KMS).
