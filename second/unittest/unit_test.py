@@ -1,6 +1,6 @@
 import unittest
 import polars as pl
-from ..ReportGenerator import FundReportGenerator
+from ..assessment_two import FundReportGenerator
 
 def generate_report(fund: str):
     return [True]

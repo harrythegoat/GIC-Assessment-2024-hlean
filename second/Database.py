@@ -191,10 +191,7 @@ def delete_row(table: declarative_base, conditions: tuple):
 
 
 if __name__ == '__main__':
-    # uncomment to load external_funds data
-    # load_external_funds()
-    # read_external_funds = pl.read_database(query=os.getenv("EXTERNAL_FUNDS"), connection=session, infer_schema_length=None)
-    # session.close()
-    # print(read_external_funds)
-    # load_prog_name()
+    # Run (ONLY) once for both the assessment
+    load_external_funds()
+    load_prog_name()
     load_dependency_rule()
