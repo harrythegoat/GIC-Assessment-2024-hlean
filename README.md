@@ -18,7 +18,6 @@ Steps-To-Load:<br/>
   7. Views for Top Performing Equities for Funds (Monthly & All-Time) both are shown in the output. Views are retrieved from PostgreSQL Views.
   8. WRITE_TO_DB (Only String "TRUE" or "FALSE" is acceptable) can be set to toggle update generated report data to db via .env file (data can be access by querying price_difference table).
 
-<br/>
 Gap-Required-For-Production:<br/>
   1. UnitTest to be completed.
   2. More robust PostgreSQL CRUD methods/class.
@@ -27,18 +26,18 @@ Gap-Required-For-Production:<br/>
   5. May need API integration for storing generated reports to AWS S3.
   6. Setup ETL pipeline to inject/load pre-requisited data Eg. (master-reference data or funds report data).
   7. CI/CD pipeline can be setup for continuos integration and deployment.
-<br/>
+
 Answers-Questions:<br/>
   Q: Show the break with instrument data ref price vs fund price.<br/>
   A: ![image](https://github.com/user-attachments/assets/ec2d422c-fca5-4e06-aac1-2af6a57882fb)
-  <br/>
+
   Q: Describe scalability approach for "N" numbers of fund reports in the future.<br/>
   A: Suggest to use AWS Lambda for horizontal scaling or AWS ECS to host application and utilizes the Auto Scaling ability.<br/>
-  <br/>
+  
   Q: SQL view/views which gives a report as to which was the best performing fund for equities every month and the cumulative profit/loss for that fund for equities.<br/>
-  A1: Monthly Best Performing Funds and their cumulative profit/loss<br/>
+  A1: Monthly Best Performing Funds and their cumulative profit/loss
   ![image](https://github.com/user-attachments/assets/f36bd0c4-19cf-4aeb-9ee1-e8dbfef1aeea)
-  <br/>
+
   A2: All-Time Top Performing Funds<br/>
   ![image](https://github.com/user-attachments/assets/83fb4b52-89f6-438a-bb7d-054153002234)<br/>
 
