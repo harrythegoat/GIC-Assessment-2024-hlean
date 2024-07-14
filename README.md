@@ -19,7 +19,7 @@ Steps-To-Load:<br/>
   8. WRITE_TO_DB (Only String "TRUE" or "FALSE" is acceptable) can be set to toggle update generated report data to db via .env file (data can be access by querying price_difference table).
 
 <br/>
-Gap-Required-For-Production:
+Gap-Required-For-Production:<br/>
   1. UnitTest to be completed.
   2. More robust PostgreSQL CRUD methods/class.
   3. Store server/db keys to more secured platform (AWS KMS).
