@@ -36,7 +36,7 @@ First-Approach:<br/>
 Second-Approach:<br/>
 Gap-Required-For-Production:<br/>
   1. UnitTest to be completed.
-  2. More robust PostgreSQL CRUD methods/class.
+  2. More robust PostgreSQL CRUD methods/class. (Currently utlizing sqlalche+polars db methods)
   3. Store server/db keys to more secured platform (AWS KMS).
   4. May use Docker for deployment (needs docker configurations).
   5. May need API integration for storing generated reports to AWS S3.
