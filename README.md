@@ -13,7 +13,7 @@ Steps-To-Load:<br/>
   2. pip install -r requirements.txt
   3. Adjust environment variables value in .env file.
   4. Run second/Database.py to load data into db for 1st & 2nd assessment (Please run only once to prevent duplicated inserts).
-  5. Run all schemas .sql in schemas folder (master-reference-sql.sql and top-performing-funds-views.sql).
+  5. Run all schemas .sql in schemas folder (master-reference-sql.sql and top-performing-funds-views.sql).<br/>
   ![image](https://github.com/user-attachments/assets/b74c9442-cf0e-4cb9-8ebb-33f2ac38b965)
   ![image](https://github.com/user-attachments/assets/715a26df-ffc0-4096-b0ee-7a0804ba87f2)
 
