@@ -35,11 +35,11 @@ Answers-Questions:<br/>
   A: Suggest to use AWS Lambda for horizontal scaling or AWS ECS to host application and utilizes the Auto Scaling ability.<br/>
   
   Q: SQL view/views which gives a report as to which was the best performing fund for equities every month and the cumulative profit/loss for that fund for equities.<br/>
-  A1: Monthly Best Performing Funds and their cumulative profit/loss
+  A1: Monthly Best Performing Funds and their cumulative profit/loss<br/>
   ![image](https://github.com/user-attachments/assets/f36bd0c4-19cf-4aeb-9ee1-e8dbfef1aeea)
 
   A2: All-Time Top Performing Funds<br/>
-  ![image](https://github.com/user-attachments/assets/83fb4b52-89f6-438a-bb7d-054153002234)<br/>
+  ![image](https://github.com/user-attachments/assets/83fb4b52-89f6-438a-bb7d-054153002234)
 
 
   
