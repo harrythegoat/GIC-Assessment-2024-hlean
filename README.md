@@ -12,7 +12,7 @@ Steps-To-Load:<br/>
   1. Create PostgreSQL database.
   2. pip install -r requirements.txt
   3. Adjust environment variables value in .env file.
-  4. Run Database.py to load data into db for 1st & 2nd assessment (Please run only once to prevent duplicated inserts).
+  4. Run second/Database.py to load data into db for 1st & 2nd assessment (Please run only once to prevent duplicated inserts).
   5. Run all schemas .sql in schemas folder (master-reference-sql.sql and top-performing-funds-views.sql).
   6. Run ReportGenerator.py.
   7. Reports will be generated in reports folder.<br/>
