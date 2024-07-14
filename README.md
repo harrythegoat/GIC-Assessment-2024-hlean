@@ -28,6 +28,11 @@ Steps-To-Load:<br/>
   9. Views for Top Performing Equities for Funds (Monthly & All-Time) both are shown in the output. Views are retrieved from PostgreSQL Views.
   10. WRITE_TO_DB (Only String "TRUE" or "FALSE" is acceptable) can be set to toggle update generated report data to db via .env file (data can be access by querying price_difference table).
 
+First-Approach:<br/>
+![image](https://github.com/user-attachments/assets/9b3d3ef5-98a2-422c-8d05-9955b8bfd1e2)
+
+
+Second-Approach:<br/>
 Gap-Required-For-Production:<br/>
   1. UnitTest to be completed.
   2. More robust PostgreSQL CRUD methods/class.
