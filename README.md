@@ -10,11 +10,12 @@ sql_schemas - Schemas for creating top performing funds in months and all-time<b
 
 Steps-To-Load:<br/>
   1. Create PostgreSQL database.
-  2. Adjust environment variables value in .env file.
-  3. Run Database.py to load data into db for 1st & 2nd assessment (Please run only once to prevent duplicated inserts).
-  4. Run all schemas .sql in schemas folder (master-reference-sql.sql and top-performing-funds-views.sql).
-  5. Run ReportGenerator.py.
-  6. Reports will be generated in reports folder.<br/>
+  2. pip install -r requirements.txt
+  3. Adjust environment variables value in .env file.
+  4. Run Database.py to load data into db for 1st & 2nd assessment (Please run only once to prevent duplicated inserts).
+  5. Run all schemas .sql in schemas folder (master-reference-sql.sql and top-performing-funds-views.sql).
+  6. Run ReportGenerator.py.
+  7. Reports will be generated in reports folder.<br/>
   ![image](https://github.com/user-attachments/assets/890d97ab-f1c7-4d24-9148-d8e60d050f8d)
   ![image](https://github.com/user-attachments/assets/4f5082f3-c62e-4a44-b8b1-40a6aafba33e)
   ![image](https://github.com/user-attachments/assets/8bca3b8a-b11f-4f46-a6bb-231809678d95)
