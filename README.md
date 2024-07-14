@@ -14,9 +14,15 @@ Steps-To-Load:<br/>
   3. Run Database.py to load data into db for 1st & 2nd assessment (Please run only once to prevent duplicated inserts).
   4. Run all schemas .sql in schemas folder (master-reference-sql.sql and top-performing-funds-views.sql).
   5. Run ReportGenerator.py.
-  6. Reports will be generated in reports folder.
-  7. Views for Top Performing Equities for Funds (Monthly & All-Time) both are shown in the output. Views are retrieved from PostgreSQL Views.
-  8. WRITE_TO_DB (Only String "TRUE" or "FALSE" is acceptable) can be set to toggle update generated report data to db via .env file (data can be access by querying price_difference table).
+  6. Reports will be generated in reports folder.<br/>
+  ![image](https://github.com/user-attachments/assets/890d97ab-f1c7-4d24-9148-d8e60d050f8d)
+  ![image](https://github.com/user-attachments/assets/4f5082f3-c62e-4a44-b8b1-40a6aafba33e)
+  ![image](https://github.com/user-attachments/assets/8bca3b8a-b11f-4f46-a6bb-231809678d95)
+  ![image](https://github.com/user-attachments/assets/6645084f-4d21-42bd-9447-0d6d34a36567)
+  ![image](https://github.com/user-attachments/assets/522ffba2-6215-452d-8fc1-f056708f31c9)
+  
+  8. Views for Top Performing Equities for Funds (Monthly & All-Time) both are shown in the output. Views are retrieved from PostgreSQL Views.
+  9. WRITE_TO_DB (Only String "TRUE" or "FALSE" is acceptable) can be set to toggle update generated report data to db via .env file (data can be access by querying price_difference table).
 
 Gap-Required-For-Production:<br/>
   1. UnitTest to be completed.
