@@ -1,6 +1,5 @@
 import os, re
 import pandas as pd
-import polars as pl
 import dateutil.parser
 from datetime import datetime
 from dotenv import load_dotenv
@@ -45,6 +44,22 @@ class PriceDifference(Base):
     price_diff = Column(DOUBLE_PRECISION)
     last_updated = Column(String)
 
+class ProgName(Base):
+    __tablename__ = "prog_name"
+    __table_args__ = {"extend_existing": True}
+    id = Column(Integer, primary_key=True)
+    unit_nbr = Column(Integer)
+    step_seq_id = Column(Integer)
+    step_prog_name = Column(String)
+
+class DependencyRule(Base):
+    __tablename__ = "dependency_rule"
+    __table_args__ = {"extend_existing": True}
+    id = Column(Integer, primary_key=True)
+    unit_nbr = Column(Integer)
+    rule_id = Column(Integer)
+    step_seq_id = Column(Integer)
+    step_dep_id = Column(Integer)
 
 # Create the table in the database
 Base.metadata.create_all(engine, checkfirst=True)
@@ -96,6 +111,54 @@ def load_external_funds():
     session.commit()
     session.close()
 
+def load_prog_name():
+    prog_names = [
+        {"unit_nbr": 1, "step_seq_id": 1, "step_prog_name": "PKGIDS_CMMN_UTILITY.PROCIDS_JOB_START"},
+        {"unit_nbr": 1, "step_seq_id": 2, "step_prog_name": "pkgids_ptf_hrchy_processing.Procids_delete_job_set_nbr"},
+        {"unit_nbr": 1, "step_seq_id": 3, "step_prog_name": "PKGIDS_PTF_EXTR.ext_static_ptf_table"},
+        {"unit_nbr": 1, "step_seq_id": 4, "step_prog_name": "PKGIDS_PTF_EXTR.ext_eff_ptf_table"},
+        {"unit_nbr": 1, "step_seq_id": 5, "step_prog_name": "pkgids_ptf_hrchy_processing.procids_get_tree_a"},
+        {"unit_nbr": 1, "step_seq_id": 6, "step_prog_name": "pkgids_ptf_hrchy_processing.procids_get_tree_b"},
+        {"unit_nbr": 1, "step_seq_id": 7, "step_prog_name": "pkgids_ptf_hrchy_processing.procids_get_tree_c"},
+        {"unit_nbr": 1, "step_seq_id": 8, "step_prog_name": "pkgids_ptf_hrchy_processing.procids_get_tree_d"},
+        {"unit_nbr": 1, "step_seq_id": 9, "step_prog_name": "pkgids_ptf_hrchy_processing.procids_get_tree_e"},
+        {"unit_nbr": 1, "step_seq_id": 10, "step_prog_name": "pkgids_ptf_hrchy_processing.procids_get_active_portf"},
+        {"unit_nbr": 1, "step_seq_id": 11, "step_prog_name": "pkgids_ptf_lineage.procids_process_ptf_lineage"},
+        {"unit_nbr": 1, "step_seq_id": 12, "step_prog_name": "pkgids_ptf_lineage.procids_summary_to_bookable_rs"},
+        {"unit_nbr": 1, "step_seq_id": 13, "step_prog_name": "PKGIDS_CMMN_UTILITY.PROCIDS_JOB_END"}
+    ]
+    for name in prog_names:
+        insert_row(ProgName, name)
+
+def load_dependency_rule():
+    dependency_rules = [
+        {"unit_nbr": 1, "rule_id": 1, "step_seq_id": 1, "step_dep_id": 0},
+        {"unit_nbr": 1, "rule_id": 2, "step_seq_id": 2, "step_dep_id": 1},
+        {"unit_nbr": 1, "rule_id": 3, "step_seq_id": 3, "step_dep_id": 2},
+        {"unit_nbr": 1, "rule_id": 4, "step_seq_id": 4, "step_dep_id": 2},
+        {"unit_nbr": 1, "rule_id": 5, "step_seq_id": 5, "step_dep_id": 3},
+        {"unit_nbr": 1, "rule_id": 6, "step_seq_id": 5, "step_dep_id": 4},
+        {"unit_nbr": 1, "rule_id": 7, "step_seq_id": 6, "step_dep_id": 3},
+        {"unit_nbr": 1, "rule_id": 8, "step_seq_id": 6, "step_dep_id": 4},
+        {"unit_nbr": 1, "rule_id": 9, "step_seq_id": 7, "step_dep_id": 3},
+        {"unit_nbr": 1, "rule_id": 10, "step_seq_id": 7, "step_dep_id": 4},
+        {"unit_nbr": 1, "rule_id": 11, "step_seq_id": 8, "step_dep_id": 3},
+        {"unit_nbr": 1, "rule_id": 12, "step_seq_id": 9, "step_dep_id": 3},
+        {"unit_nbr": 1, "rule_id": 13, "step_seq_id": 8, "step_dep_id": 4},
+        {"unit_nbr": 1, "rule_id": 14, "step_seq_id": 9, "step_dep_id": 4},
+        {"unit_nbr": 1, "rule_id": 15, "step_seq_id": 10, "step_dep_id": 5},
+        {"unit_nbr": 1, "rule_id": 16, "step_seq_id": 10, "step_dep_id": 6},
+        {"unit_nbr": 1, "rule_id": 17, "step_seq_id": 10, "step_dep_id": 7},
+        {"unit_nbr": 1, "rule_id": 18, "step_seq_id": 10, "step_dep_id": 8},
+        {"unit_nbr": 1, "rule_id": 19, "step_seq_id": 10, "step_dep_id": 9},
+        {"unit_nbr": 1, "rule_id": 20, "step_seq_id": 11, "step_dep_id": 10},
+        {"unit_nbr": 1, "rule_id": 21, "step_seq_id": 12, "step_dep_id": 11},
+        {"unit_nbr": 1, "rule_id": 22, "step_seq_id": 13, "step_dep_id": 12},
+    ]
+    for name in dependency_rules:
+        insert_row(DependencyRule, name)
+
+
 
 def insert_row(table: declarative_base, values: dict):
     stmt = (
@@ -130,6 +193,8 @@ def delete_row(table: declarative_base, conditions: tuple):
 if __name__ == '__main__':
     # uncomment to load external_funds data
     # load_external_funds()
-    read_external_funds = pl.read_database(query=os.getenv("EXTERNAL_FUNDS"), connection=session, infer_schema_length=None)
-    session.close()
-    print(read_external_funds)
+    # read_external_funds = pl.read_database(query=os.getenv("EXTERNAL_FUNDS"), connection=session, infer_schema_length=None)
+    # session.close()
+    # print(read_external_funds)
+    # load_prog_name()
+    load_dependency_rule()

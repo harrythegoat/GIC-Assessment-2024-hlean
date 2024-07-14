@@ -1,6 +1,15 @@
-import asyncio, time
+import os
+import time
+import asyncio
 import pandas as pd
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
+
+
+load_dotenv()
+print(os.getenv("DB_URL"))
+engine = create_engine(os.getenv("DB_URL"))
+conn = engine.connect()
 
 
 class Queue:
@@ -8,43 +17,37 @@ class Queue:
         self.tracker, self.program_names, self.cluster_routine, self.tracker = {}, {}, {}, {}
         self.dependency_ids, self.dependency_keys = [], []
         self.table_names = table_names
-        self.db_uri = r'postgresql://postgres:admin123@localhost:5432/gic_funds'
-        self.db = create_engine(self.db_uri)
         asyncio.run(self.load_data(self.table_names))
 
     async def process_data(self, table_name):
         match table_name:
             case "prog_name":
-                conn = self.db.connect()
                 # # some simple data operations
                 sql_query = 'SELECT * FROM prog_name'
-                table = pd.read_sql(sql_query, self.db)
+                table = pd.read_sql(sql_query, conn)
                 data = table.to_dict('list')
-                conn.close()
                 for i in range(0, len(table)):
-                    self.program_names[data['STEP_SEQ_ID'][i]] = data['STEP_PROG_NAME'][i]
+                    self.program_names[data['step_seq_id'][i]] = data['step_prog_name'][i]
                 return True
             case "dependency_rule":
-                conn = self.db.connect()
                 sql_query = 'SELECT * FROM dependency_rule'
-                table = pd.read_sql(sql_query, self.db)
+                table = pd.read_sql(sql_query, conn)
                 data = table.to_dict('list')
-                conn.close()
                 for i in range(0, len(table)):
-                    dep_id = data['STEP_DEP_ID'][i]
+                    dep_id = data['step_dep_id'][i]
                     self.dependency_ids.append(dep_id)
                     if dep_id not in self.cluster_routine:
                         self.cluster_routine[dep_id] = []
                         self.cluster_routine[dep_id].append({
-                            'rule_id': data['RULE_ID'][i],
-                            'seq_id': data['STEP_SEQ_ID'][i],
-                            'unit_nbr': data['UNIT_NBR'][i]
+                            'rule_id': data['rule_id'][i],
+                            'seq_id': data['step_seq_id'][i],
+                            'unit_nbr': data['unit_nbr'][i]
                         })
                     else:
                         self.cluster_routine[dep_id].append({
-                            'rule_id': data['RULE_ID'][i],
-                            'seq_id': data['STEP_SEQ_ID'][i],
-                            'unit_nbr': data['UNIT_NBR'][i]
+                            'rule_id': data['rule_id'][i],
+                            'seq_id': data['step_seq_id'][i],
+                            'unit_nbr': data['unit_nbr'][i]
                         })
                 self.dependency_keys = list(set(self.dependency_ids))
                 return True
@@ -62,7 +65,6 @@ class Queue:
         return True if all(check_all) else False
 
     async def run_program(self, seq_id, rule_id, dep_id, wait):
-        await asyncio.sleep(wait)
         print("RULE ID ({}): {} -> {}".format(rule_id, self.program_names[seq_id], dep_id))
         if seq_id not in self.tracker:
             self.tracker[seq_id] = True
@@ -99,3 +101,4 @@ if __name__ == '__main__':
     table_names = ['prog_name', 'dependency_rule']
     queue = Queue(table_names=table_names)
     asyncio.run(queue.main())
+    conn.close()
