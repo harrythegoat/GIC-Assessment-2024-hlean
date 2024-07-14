@@ -29,6 +29,7 @@ Steps-To-Load:<br/>
   10. WRITE_TO_DB (Only String "TRUE" or "FALSE" is acceptable) can be set to toggle update generated report data to db via .env file (data can be access by querying price_difference table).
 
 First-Approach:<br/>
+  1. Utilizes asyncio lib to create async tasks concurrently as soon as depending tasks is completed.
 ![image](https://github.com/user-attachments/assets/9b3d3ef5-98a2-422c-8d05-9955b8bfd1e2)
 
 
