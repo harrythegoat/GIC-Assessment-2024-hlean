@@ -1,10 +1,11 @@
-import os, re
+import os
+import re
 import pandas as pd
 import dateutil.parser
 from datetime import datetime
 from dotenv import load_dotenv
 from sqlalchemy.orm import sessionmaker, declarative_base
-from sqlalchemy import create_engine, Column, Integer, String, DOUBLE_PRECISION, Date, Float, insert, delete, update
+from sqlalchemy import create_engine, Column, Integer, String, DOUBLE_PRECISION, Date, insert, delete, update
 
 load_dotenv()
 engine = create_engine(os.getenv("DB_URL"))
@@ -85,7 +86,6 @@ def load_external_funds():
             if len(temp_date) == 1:
                 temp = str(dateutil.parser.parse(temp_date[0])).split()[0]
                 formatted = datetime.strptime(temp, '%Y-%m-%d').date()
-                print("formatted", formatted)
                 final_date = formatted
             else:
                 convert = [int(x) for x in temp_date]
@@ -106,7 +106,6 @@ def load_external_funds():
                 "REALISED P/L": "realised_pl",
                 "MARKET VALUE": "market_value"
             }, inplace=True)
-            print(report_csv)
             report_csv.to_sql("funds_report", con=engine, if_exists="append", index=False)
     session.commit()
     session.close()
@@ -164,7 +163,6 @@ def insert_row(table: declarative_base, values: dict):
     stmt = (
         insert(table).values(values)
     )
-    print(f"Executing {stmt}")
     session.execute(stmt)
     session.commit()
     session.close()
@@ -174,7 +172,6 @@ def update_row(table: declarative_base, columns: tuple, values: dict):
     stmt = (
         update(table).where(*columns).values(values)
     )
-    print(f"Executing {stmt}")
     session.execute(stmt)
     session.commit()
     session.close()
@@ -184,7 +181,6 @@ def delete_row(table: declarative_base, conditions: tuple):
     stmt = (
         delete(table).where(*conditions)
     )
-    print(f"Executing {stmt}")
     session.execute(stmt)
     session.commit()
     session.close()
@@ -192,6 +188,9 @@ def delete_row(table: declarative_base, conditions: tuple):
 
 if __name__ == '__main__':
     # Run (ONLY) once for both the assessment
-    load_external_funds()
+    print(f"Assessment One: Loading Prog Name data.")
     load_prog_name()
+    print(f"Assessment One: Loading Dependency Rule data.")
     load_dependency_rule()
+    print(f"Assessment Two: Loading external funds data.")
+    load_external_funds()
