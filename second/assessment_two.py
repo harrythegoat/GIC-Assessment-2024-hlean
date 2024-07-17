@@ -27,6 +27,7 @@ class FundReportGenerator:
             self.fund_report_path = ""
             self.equity_report_path = ""
             self.bond_report_path = ""
+            self.master_reference = dict()
             self.write_to_db = os.getenv("WRITE_TO_DB")
         except Exception as err:
             self.logger(msg=err)
@@ -66,7 +67,14 @@ class FundReportGenerator:
                 "monthly_performing": os.getenv("MONTHLY_PERFORMING"),
                 "all_time_performing": os.getenv("ALL_TIME_PERFORMING")
             }
-            # self.__get_master_reference(queries=self.queries)
+
+            # async approach
+            # check_all = []
+            # for key, query in self.queries.items():
+            #     check_all.append(asyncio.create_task(self.__get_master_reference(key=key, query=query))
+
+            # check_all = all([await result for result in check_all])
+                                                            
             # need func
             self.funds_report = pl.read_database(query=self.queries["funds_report"], connection=conn,
                                                  infer_schema_length=None)
@@ -78,18 +86,22 @@ class FundReportGenerator:
         except Exception as err:
             self.logger(msg=err)
 
-    async def __get_master_reference(self, queries: dict):
+    async def __get_master_reference(self, key: str, query: str):
         try:
-            master_reference = dict()
-            for key, query in queries.items():
-                res = pl.read_database(query=query, connection=conn, infer_schema_length=None)
-                if res.is_empty():
-                    raise(f"Master reference data for {key} is empty.")
-                if "funds_report" == key:
-                    master_reference["funds"] = pl.Series(res.select(pl.col("fund").unique())).sort().to_list()
-                master_refence[key] = res
+
+            res = pl.read_database(query=query, connection=conn, infer_schema_length=None)
+            if res.is_empty():
+                raise(f"Master Reference df for {key} is empty.")
+            self.master_reference[key] = res
+            # for key, query in queries.items():
+            #     res = pl.read_database(query=query, connection=conn, infer_schema_length=None)
+            #     if res.is_empty():
+            #         raise(f"Master reference data for {key} is empty.")
+            #     if "funds_report" == key:
+            #         master_reference["funds"] = pl.Series(res.select(pl.col("fund").unique())).sort().to_list()
+            #     master_refence[key] = res
             # asyncio approach to be considered
-            return master_reference
+            return True
         except Exception as err:
             self.logger(msg=err)
 
