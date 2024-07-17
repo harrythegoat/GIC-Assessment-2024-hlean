@@ -66,7 +66,7 @@ Base.metadata.create_all(engine, checkfirst=True)
 
 
 def load_external_funds():
-    folder_path = r"C:\Users\PC\Desktop\Git\gic_assessment\external-funds"
+    folder_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'external-funds'))
     reports = sorted(os.path.join(folder_path, x) for x in os.listdir(folder_path))
 
     funds = ['Whitestone', 'Wallington', 'Catalysm', 'Belaware',
