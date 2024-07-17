@@ -67,13 +67,6 @@ class FundReportGenerator:
                 "monthly_performing": os.getenv("MONTHLY_PERFORMING"),
                 "all_time_performing": os.getenv("ALL_TIME_PERFORMING")
             }
-
-            # async approach
-            # check_all = []
-            # for key, query in self.queries.items():
-            #     check_all.append(asyncio.create_task(self.__get_master_reference(key=key, query=query))
-
-            # check_all = all([await result for result in check_all])
                                                             
             # need func
             self.funds_report = pl.read_database(query=self.queries["funds_report"], connection=conn,
@@ -86,24 +79,6 @@ class FundReportGenerator:
         except Exception as err:
             self.logger(msg=err)
 
-    async def __get_master_reference(self, key: str, query: str):
-        try:
-
-            res = pl.read_database(query=query, connection=conn, infer_schema_length=None)
-            if res.is_empty():
-                raise(f"Master Reference df for {key} is empty.")
-            self.master_reference[key] = res
-            # for key, query in queries.items():
-            #     res = pl.read_database(query=query, connection=conn, infer_schema_length=None)
-            #     if res.is_empty():
-            #         raise(f"Master reference data for {key} is empty.")
-            #     if "funds_report" == key:
-            #         master_reference["funds"] = pl.Series(res.select(pl.col("fund").unique())).sort().to_list()
-            #     master_refence[key] = res
-            # asyncio approach to be considered
-            return True
-        except Exception as err:
-            self.logger(msg=err)
 
     async def main(self):
         """
@@ -112,7 +87,7 @@ class FundReportGenerator:
         try:
             # Start of report generation
             self.logger("Running Price Reconciliation Report Generator")
-            start_time = time.time()
+            start_time = time.perf_counter()
             tasks = []
 
             for fund in self.funds:
@@ -128,7 +103,7 @@ class FundReportGenerator:
             top_fund_max = self.get_view(query=self.queries["all_time_performing"])
             self.logger(msg=f"Monthly Top Performing Funds\n{ top_fund_monthly }")
             self.logger(msg=f"All Time Top Performing Fund\n{ top_fund_max }")
-            end_time = time.time()
+            end_time = time.perf_counter()
             self.logger(f"Total Execution Time: { end_time - start_time }")
         except Exception as err:
             self.logger(msg=err)
