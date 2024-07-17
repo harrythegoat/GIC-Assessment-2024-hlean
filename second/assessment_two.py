@@ -66,7 +66,7 @@ class FundReportGenerator:
                 "monthly_performing": os.getenv("MONTHLY_PERFORMING"),
                 "all_time_performing": os.getenv("ALL_TIME_PERFORMING")
             }
-
+            # self.__get_master_reference(queries=self.queries)
             # need func
             self.funds_report = pl.read_database(query=self.queries["funds_report"], connection=conn,
                                                  infer_schema_length=None)
@@ -75,6 +75,21 @@ class FundReportGenerator:
             self.bond_prices = pl.read_database(query=self.queries["bonds_prices"], connection=conn,
                                                 infer_schema_length=None)
             self.funds = pl.Series(self.funds_report.select(pl.col("fund").unique())).sort().to_list()
+        except Exception as err:
+            self.logger(msg=err)
+
+    async def __get_master_reference(self, queries: dict):
+        try:
+            master_reference = dict()
+            for key, query in queries.items():
+                res = pl.read_database(query=query, connection=conn, infer_schema_length=None)
+                if res.is_empty():
+                    raise(f"Master reference data for {key} is empty.")
+                if "funds_report" == key:
+                    master_reference["funds"] = pl.Series(res.select(pl.col("fund").unique())).sort().to_list()
+                master_refence[key] = res
+            # asyncio approach to be considered
+            return master_reference
         except Exception as err:
             self.logger(msg=err)
 
