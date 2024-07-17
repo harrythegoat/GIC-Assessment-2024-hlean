@@ -265,15 +265,16 @@ class FundReportGenerator:
             instr_key_lowered = instr_key.lower()
             ref_prices = data.filter(pl.col(instr_key) == name)
 
+            # Adding both the month and year columns for partitioning
             get_month_year_df = ref_prices.select(
                 pl.col('DATETIME').str.strptime(pl.Datetime, format=date_fmt, strict=False).alias("ref_datetime"),
                 pl.col('PRICE').alias("price"),
                 pl.col(instr_key).alias(instr_key_lowered),
                 pl.col('DATETIME').str.strptime(pl.Datetime, format=date_fmt, strict=False).dt.month().alias('month'),
                 pl.col('DATETIME').str.strptime(pl.Datetime, format=date_fmt, strict=False).dt.year().alias('year')
-            ).sort('ref_datetime')
+            ).sort("ref_datetime")
 
-            # Partition data by Month, Year and SYMBOL/ISIN
+            # Partitioning data into one table that have the same month and year and the instrument id
             month_year_partition_df = get_month_year_df.partition_by('year', 'month', instr_key_lowered)
 
             # Get all the end of month price data from master reference by Month, Year
@@ -286,10 +287,12 @@ class FundReportGenerator:
                     month_year_df = eom_date
                 else:
                     month_year_df.extend(eom_date)
+
             # Price data from master reference
             filtered_month_year_df = month_year_df.select(pl.col(instr_key_lowered), pl.col('ref_datetime').sort(),
                                                           pl.col('price').alias('ref_price'), pl.col('month'),
                                                           pl.col('year'))
+
             return filtered_month_year_df
         except Exception as err:
             self.logger(msg=err)
