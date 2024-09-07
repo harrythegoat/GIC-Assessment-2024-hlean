@@ -1,6 +1,10 @@
 name: Pylint
 
-on: [push]
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment Type (Dev, UAT)"
 
 jobs:
   build:
